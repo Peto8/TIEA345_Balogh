@@ -1,0 +1,42 @@
+Demo1
+
+1.1
+
+- Loin git repon "https://github.com/Peto8/TIEA345_Balogh.git"
+
+
+1.2
+
+- Muutin tarvittavat asetukset (timezone, keyboard, wificountry, ssh:n salliminen 
+  ja salasana "passwd" komennolla)
+
+- Päivitin komennoilla 
+	-sudo apt-get update
+	-sudo apt-get dist-upgrade
+
+
+1.3
+
+- Sallimalla verkkoyhteyden asetuksisa sallimaan netin jakamisen netin Rasberry Pi-hin
+- Raspin ip:n katsoin "ifconfig" komennolla
+	-wlan : 192.168.100.104
+	-eth  : 169.254.11.157
+- otin wlanin kautta SSH yhteyden. Käyttäjänimi pi!
+- etäyhteydellä asensin tightVNC:n 
+	-"sudo apt-get install tightvncserver"
+	-"sudo apt-get update"
+	-"sudo raspi-config" -> täältä allow interface ja allow vnc
+
+
+1.4
+
+- Latasin imagen osoitteesta "https://downloads.raspberrypi.org/raspbian_latest"
+- Fläshin muistikortille ladatun tiedoston käyttäen Etcher1.4.9 portable -ohjelmaa
+- Näyttö, näppäimistö, hiiri, muistikortti ja virta rasperryyn kiinni ja sain toimimaan
+
+
+
+	
+ "sudo shutdown -h now"
+ "sudo nano /etc/wpa_supplicant/wpa_supplicant.conf" -> saa konffattua wifiyhteyksiä
+	
