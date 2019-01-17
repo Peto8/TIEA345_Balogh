@@ -1,0 +1,9 @@
+Ainoastaan viimeisest‰ vaiheesta dokumentaatio, koska sis‰lt‰‰ aikasemmat vaiheet*.
+
+Tiedostot:
+-sensor.py
+-schematic.png
+
+Video:
+Videossa, ensin tapaus jossa sensori ei n‰e liikett‰, sitten tapaus jossa alussa n‰kyy liikett‰.
+https://www.youtube.com/watch?v=6faTqErfgJs
