@@ -1,0 +1,73 @@
+#3.1: Sensori toimintakuntoon ja dataa ruutuun.#
+
+ - Rakensin breadbordille DHT11 sensorille sopivan piirin
+
+ - asensin Adafruit_Python_DHT kirjaston pythonille ohjeiden mukaan
+"""
+git clone https://github.com/adafruit/Adafruit_Python_DHT.git  
+cd Adafruit_Python_DHT  
+sudo apt-get update  
+sudo apt-get install build-essential python-dev python-openssl
+"""
+kansiossa "sudo python setup.py install"
+
+ - kirjoitin python koodin, mikä tulostaa näyttöön lämpötilan ja kosteuden arvoja (sama koodi joka vie arvot sheetsiin)
+   *heatsensor.py*
+
+"Temp=10.0*C  Humidity=26.0%
+
+
+#3.2: Sensorin dataa Google Sheetsiin #
+ - loin google datasheetsin
+
+ - "sudo pip install gspread oauth2client"
+
+ - google developerista piti sallia sheetsin API, luoda sille kredentiaalit ja tallentaa saatu json tiedosto 
+
+ - Account-Key tiedoston latasin omalle konelle ja kopioin sen raspille luomalla uuden tiedoston "touch" komennolla ja kopioimalla
+   sinne tiedoston sisällön. Tiedosto on olemassa siis vain raspilla. Kirjoittamani koodi lukee tiedoston ja siten tietää kredentiaalit.
+
+ - käytin pyhtonissa gspreadin komentoja taulukon muokkaamiseen jotka löysin sivusta https://media.readthedocs.org/pdf/gspread/latest/gspread.pdf
+
+ - tiedostossa "heatsensor.py" löytyy koodi jonka ajamalla pi-ssä. Pvm,  lämpötila ja kosteus lisätään google sheetsiin.
+
+ - linkki varmuuden vuoksi:
+	https://docs.google.com/spreadsheets/d/1YdMa_ejyOt2lZayLBtuaGqx-R_Z3OHxjsszqotnLBWM/edit?usp=sharing
+
+#3.3: Raspilla kuva ja video #
+ -otin huonolaatuisen kuvan komennolla "raspistill -o kuva.jpg "
+ -videon komento :"raspivid -w 640 -h 360 -t 15000 -o video.h264" komenolla sain siis 15s videon laadulla 360p
+ -tiedostot sain omalle koneelle winSCP:n avlla
+ -linkki videoon: 
+	https://youtu.be/2PGn6TGqBCc
+
+#3.4: Liiketunnistin ja camera
+- python koodini tarkastaa liikettunnisitimen arvon sekunnin välein, jos on liikettä, otetaan kuva jonka
+  nimessä on senhetkinen aika, ja odotetaan 3s
+- tiedosto: "camera.py"
+
+#3.5 Kuva aina tasatunnein
+
+-yksinkertainen python koodi otta kuvan kun se ajetaan "camhourly.py"
+-crontabillä hoitui aikatauluttaminen. Lisäsin crontabin confi tiedostoon "crontab -e" komennolla yhden rivin:
+	"0 * * * *  python /home/pi/Desktop/camdemo/camhourly.py"
+ mikä ajaa python ohjelman tasatunnen.
+
+#3.6 Palvelin
+-"apt-get install apache2"
+-"service apache2 start"   -tuli authentication fail kun kirjoitti ohjeiden mukaaan ilman 2:sta
+-"cd /var/www/html"
+-loin symbolisen linkin : "sudo ln -s /home/pi/Pictures/ kuva"
+-tässä kansiossa editoin "index.html"- tiedostoa. Korvasin sen sisällöt yhdellä rivillä:
+	<img src="./kuva/image.jpg" alt="picture" />
+- loin sen jälkeen python koodin "camtoweb.py", jota ajaessa tallennetaan kuva, sekä päivitetään palvelimella näkyvä kuva
+- menemällä raspin omaan ip osoitteeseen selaimella uusin otettu kuva oli aina näkyvissä.
+esimerrkikuva: palvelin.jpg
+
+
+
+
+
+
+ 
+
