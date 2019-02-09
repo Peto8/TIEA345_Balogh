@@ -1,0 +1,194 @@
+####4.1 Motionin asennus
+tiedostoon "/etc/rc.local" ->rivi lisäys "modprobe bcm2835-v4l2"
+
+- sudo apt-get update
+- sudo apt-get install motion -y
+
+uusi kansio -> ~/Desktop/motionsens/motion
+sinne kopioin conffi tiedoston "sudo cp /etc/motion/motion.conf /home/pi/Desktop/motionsense/motion/motion.conf" 
+"sudo chown pi:pi motion/motion.conf"
+
+motion.conf tiedostoon muutokset:
+# File to store the process ID, also called pid file. (default: not defined)
+
+process_id_file /home/pi/Desktop/motionsense/motion/motion.pid
+
+# Use a file to save logs messages, if not defined stderr and syslog is used. (default: not defined)
+
+logfile /home/pi/Desktop/motionsense/motion/motion.log
+
+# Target base directory for pictures and films
+# Recommended to use absolute path. (Default: current working directory)
+
+target_dir /home/pi/Desktop/motionsense/motion
+
+####4.2 Kuvia ennen liikettä
+
+# Specifies the number of pre-captured (buffered) pictures from before motion
+
+# was detected that will be output at motion detection.
+
+# Recommended range: 0 to 5 (default: 0)
+
+# Do not use large values! Large values will cause Motion to skip video frames and
+
+# cause unsmooth movies. To smooth movies use larger values of post_capture instead.
+
+pre_capture 2
+
+- koska framerate on 2, niin jotta 5 sec kuvia liikkeen jälkeen niin 10 kuvaa motion detectionin jälkeen ajaa asian->
+
+# Number of frames to capture after motion is no longer detected (default: 0)
+
+post_capture 10
+
+####4.3 10 sekunnin video
+
+- Rajoitetaan max 10 s ->
+
+# Maximum length in seconds of a movie
+# When value is exceeded a new movie file is created. (Default: 0 = infinite)
+
+max_movie_time 10
+
+- Otetaan minimissään 10 s ajan kuvia ->
+
+# Number of frames to capture after motion is no longer detected (default: 0)
+
+post_capture 20
+
+- Ei tallenneta kuvia, vain video
+
+# Output 'normal' pictures when motion is detected (default: on)
+
+# Valid values: on, off, first, best, center
+# When set to 'first', only the first picture of an event is saved.
+
+# Picture with most motion of an event is saved when set to 'best'.
+
+# Picture with motion nearest center of picture is saved when set to 'center'.
+
+# Can be used as preview shot for the corresponding movie.
+
+output_pictures off
+
+####4.4 Keskusta
+
+kun keskellä on liikettä ->
+
+# Output 'normal' pictures when motion is detected (default: on)
+# Valid values: on, off, first, best, center
+
+# When set to 'first', only the first picture of an event is saved.
+
+# Picture with most motion of an event is saved when set to 'best'.
+
+# Picture with motion nearest center of picture is saved when set to 'center'.
+
+# Can be used as preview shot for the corresponding movie.
+
+output_pictures center
+
+KOMMENTTI:
+yritin laluksi ->
+
+# Detect motion in predefined areas (1 - 9). Areas are numbered like that:  1 2 3
+
+# A script (on_area_detected) is started immediately when motion is         4 5 6
+
+# detected in one of the given areas, but only once during an event.        7 8 9
+
+# One or more areas can be specified with this option. Take care: This option
+
+# does NOT restrict detection to these areas! (Default: not defined)
+; 
+area_detect 5
+
+yhdessä "on_area_detected":n avulla.
+
+Kirjoitin tiedoston scripti.sh
+jonka sisällä:
+#!/bin/bash
+killall motion &&
+raspistill -o kuva.jpg &&
+motion -n
+
+Mutta useidenkaan tuntien kuluttua en onnistunut käskyttämään kuvan ottamista.
+Scripteillä ei toiminut, koska camera oli jo Motionin käytössä. ei millään saanu toimii....
+
+####4.3 OpenCV asennus
+sudo apt-get install build-essential git cmake pkg-config
+sudo apt-get install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
+
+"
+sudo apt-get install -y build-essential git cmake pkg-config libjpeg-dev \
+libtiff5-dev libjasper-dev libpng-dev libavcodec-dev libavformat-dev \
+libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libgtk2.0-dev \
+libatlas-base-dev gfortran python2.7-dev python3-dev libpng-dev \
+libtiff-dev  libdc1394-22-dev
+"
+"
+sudo pip install virtualenv virtualenvwrapper
+"
+- lisäsin kotikansion.profile -tiedoston loppuun
+"
+export WORKON_HOME=$HOME/.virtualenvs  
+source /usr/local/bin/virtualenvwrapper.sh
+"
+- sitten komento  "source ~/.profile"
+- luodaan virtuaaliympäristö nimeltä venv, "mkvirualenv cv -p python"
+(pääsee takas venviin tnäilä komennoilla : "source ~/.profile"  "workon cv"
+- "pip install numpy"
+- "pip --no-cache-dir install matplotlib"
+
+- latasin ja unzip:
+"wget http://downloads.sourceforge.net/project/opencvlibrary/opencv-unix/3.1.0/opencv-3.1.0.zip
+ wget -O opencv_contrib.zip https://github.com/Itseez/opencv_contrib/archive/3.1.0.zip
+ unzip opencv-3.1.0.zip  && unzip opencv_contrib.zip
+"
+- open cv kansiosa -> mkdir build, siellä:
+"
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+-D CMAKE_INSTALL_PREFIX=/usr/local \
+-D INSTALL_PYTHON_EXAMPLES=ON \
+-D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib-3.1.0/modules \
+-D ENABLE_PRECOMPILED_HEADERS=OFF \
+-D BUILD_EXAMPLES=ON ..
+"
+Symlinkin muodostus
+"cd ~/.virtualenvs/cv/lib/python2.7/site-packages/   
+ln -s /usr/local/lib/python2.7/site-packages/cv2.so cv2.so
+"
+-Onnistui ^^
+
+####4.4 Vertailu
+- Vertailin oman hiiren pi-kamera kuvaa netista löytyvään saman hiiren kuvaan
+koodi -> 		vertaa.py
+alkuperäiset kuvat ->	hiiri1.jpg, hiiri2.jpg
+vertailu kuva ->     	tulos.png
+
+
+####4.5 Tunnista kasvot
+koodi -> tunnistus.py
+alkuperäinen kuva -> kasvot1.jpeg
+tunnnistetu kuva -> kasvot2.png
+
+####4.6 Picameralla kasvot
+- piti installoida virtual enviromenttiin myös pi camera
+- Tein ohjelman joka kertoo mikäli otetussa kuvassa löytyy kasvot tai ei
+koodi: kuvaKasvoista.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
